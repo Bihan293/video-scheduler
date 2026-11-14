@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Авторизация TikTok — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="consent-screen">
+  <div class="consent-card">
+    <div class="consent-top">
+      <span class="consent-badge">Демо-экран авторизации</span>
+      <div class="tiktok-logo">TikTok</div>
+      <h1>{{ app_name }} запрашивает доступ</h1>
+      <p class="muted">Приложение хочет использовать ваш аккаунт TikTok.</p>
+    </div>
+
+    <div class="consent-user">
+      <div class="avatar small-avatar">V</div>
+      <div>
+        <b>video.scheduler</b>
+        <div class="muted tiny">Ваш аккаунт TikTok</div>
+      </div>
+    </div>
+
+    <div class="scopes">
+      <div class="scopes-head">Разрешения</div>
+      {% for scope in scopes %}
+      <div class="scope-row">
+        <span class="scope-check">✓</span>
+        <div>
+          <b>{{ scope }}</b>
+          <span class="muted tiny">
+            {% if scope == 'user.info.basic' %}Базовый профиль: имя, аватар, username
+            {% elif scope == 'video.upload' %}Загрузка видео в черновики аккаунта
+            {% elif scope == 'video.publish' %}Прямая публикация видео
+            {% else %}Доступ, запрошенный приложением{% endif %}
+          </span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <p class="muted tiny consent-note">
+      Это локальная демонстрация OAuth-экрана. В рабочем режиме вы будете
+      перенаправлены на <b>tiktok.com</b>, и пароль вводится только там.
+    </p>
+
+    <div class="consent-actions">
+      <a class="btn ghost" href="/">Отмена</a>
+      <a class="btn primary" href="/auth/tiktok/callback?code=demo&state={{ state }}">Разрешить</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Кабинет — {{ app_name }}{% endblock %}
+{% block content %}
+
+{% if connected %}
+<div class="notice success">TikTok подключён. Можно загружать видео.</div>
+{% endif %}
+
+<section class="dash-head">
+  <div class="account-card">
+    <div class="avatar">
+      {% if account.avatar_url %}
+        <img src="{{ account.avatar_url }}" alt="">
+      {% else %}
+        <span>{{ (account.display_name or 'T')[0]|upper }}</span>
+      {% endif %}
+    </div>
+    <div class="account-info">
+      <div class="account-name">
+        {{ account.display_name }}
+        {% if account.demo %}<span class="tag">demo</span>{% endif %}
+      </div>
+      <div class="muted">@{{ account.username or 'tiktok' }}</div>
+      <div class="account-links">
+        {% if account.linked_telegram %}
+          <span class="tiny ok-text">Telegram привязан</span>
+        {% else %}
+          <a class="tiny" href="/auth/tiktok">Привязать Telegram</a>
+        {% endif %}
+      </div>
+    </div>
+    <button class="btn ghost small" id="disconnect">Отключить</button>
+  </div>
+
+  <div class="dash-title">
+    <h1>Новая публикация</h1>
+    <p class="muted">Видео загружается напрямую в TikTok. Обработка занимает до пары минут.</p>
+  </div>
+</section>
+
+<section class="grid-2">
+  <form class="card upload-card" id="upload-form">
+    <div class="drop" id="drop">
+      <input type="file" id="file" name="file" accept="video/mp4,video/quicktime,video/webm,video/x-m4v,.mp4,.mov,.webm,.m4v" hidden>
+      <div class="drop-icon">↑</div>
+      <div class="drop-title">Перетащите видео сюда</div>
+      <div class="muted small">или нажмите, чтобы выбрать файл</div>
+      <div class="muted tiny">MP4, MOV, WEBM, M4V · до {{ max_upload_mb }} МБ · 9:16 или 16:9</div>
+    </div>
+
+    <div class="file-row" id="file-row" hidden>
+      <video id="preview" muted playsinline></video>
+      <div class="file-meta">
+        <b id="file-name"></b>
+        <span class="muted small" id="file-size"></span>
+      </div>
+      <button type="button" class="icon-btn" id="clear-file" aria-label="Убрать файл">×</button>
+    </div>
+
+    <label class="field">
+      <span>Описание</span>
+      <textarea id="title" name="title" rows="3" maxlength="2200" placeholder="Подпись к видео, хештеги…"></textarea>
+      <span class="counter"><span id="title-count">0</span>/2200</span>
+    </label>
+
+    <div class="row-2">
+      <label class="field">
+        <span>Приватность</span>
+        <select id="privacy" name="privacy_level">
+          {% for value, label in privacy_levels.items() %}
+            <option value="{{ value }}" {% if value == 'SELF_ONLY' %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="field">
+        <span>Режим</span>
+        <div class="segmented">
+          <label>
+            <input type="radio" name="mode" value="inbox" checked>
+            <span>В черновики</span>
+          </label>
+          <label>
+            <input type="radio" name="mode" value="direct">
+            <span>Опубликовать</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint" id="mode-hint">
+      Видео появится в черновиках TikTok. Вы сами добавите звук и опубликуете —
+      этот режим работает без аудита приложения.
+    </p>
+
+    <button class="btn primary wide" id="submit" type="submit" disabled>
+      Загрузить в TikTok
+    </button>
+
+    <div class="progress" id="progress" hidden>
+      <div class="bar"><span id="bar-fill"></span></div>
+      <div class="progress-text"><span id="progress-label">Загрузка…</span><span id="progress-pct">0%</span></div>
+    </div>
+    <div class="form-error" id="form-error" hidden></div>
+  </form>
+
+  <aside class="card posts-card">
+    <div class="card-head">
+      <h2>Последние публикации</h2>
+      <button class="btn ghost small" id="refresh" type="button">Обновить</button>
+    </div>
+    <div id="posts" class="posts">
+      {% if posts %}
+        {% for post in posts %}
+        <article class="post" data-id="{{ post.id }}" data-status="{{ post.status }}">
+          <div class="post-main">
+            <div class="post-title">{{ post.title or 'Без описания' }}</div>
+            <div class="muted tiny">
+              {{ post.mode == 'direct' and 'Публикация' or 'Черновик' }} ·
+              {{ post.privacy_label }} · {{ (post.video_size / 1048576)|round(1) }} МБ
+            </div>
+            {% if post.fail_reason %}<div class="fail tiny">{{ post.fail_reason }}</div>{% endif %}
+          </div>
+          <span class="status {{ post.status|lower }}">{{ post.status_label }}</span>
+        </article>
+        {% endfor %}
+      {% else %}
+        <p class="empty" id="posts-empty">Пока нет загрузок. Первое видео появится здесь.</p>
+      {% endif %}
+    </div>
+  </aside>
+</section>
+
+<section class="card note-card">
+  <h3>Как работает публикация</h3>
+  <div class="note-grid">
+    <div>
+      <b>Черновики</b>
+      <p class="muted small">TikTok присылает видео в ваш инбокс. Откройте приложение, отредактируйте и опубликуйте вручную.</p>
+    </div>
+    <div>
+      <b>Прямая публикация</b>
+      <p class="muted small">Доступна после аудита приложения TikTok. До аудита такие посты могут быть отклонены или сохранены как приватные.</p>
+    </div>
+    <div>
+      <b>Данные</b>
+      <p class="muted small">Храним OAuth-токен и историю загрузок. Видеофайлы лежат на сервере временно. Отключение удаляет аккаунт из базы.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+<script>
+  window.APP = {
+    demo: {{ demo_mode|tojson }},
+    maxMb: {{ max_upload_mb }}
+  };
+</script>
+<script src="/static/app.js"></script>
+{% endblock %}

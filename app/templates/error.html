@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Ошибка — {{ app_name }}{% endblock %}
+{% block content %}
+<section class="error-page">
+  <div class="error-code">!</div>
+  <h1>Не получилось</h1>
+  <p class="lead">{{ message }}</p>
+  <div class="cta-row">
+    <a class="btn primary" href="/">На главную</a>
+    <a class="btn ghost" href="/dashboard">В кабинет</a>
+  </div>
+</section>
+{% endblock %}
