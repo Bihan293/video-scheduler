@@ -406,7 +406,7 @@ async def api_post(request: Request, post_id: int):
     if post is None or post["account_id"] != account["id"]:
         raise HTTPException(status_code=404)
     warning = None
-    if post["status"] not in {"PUBLISH_COMPLETE", "FAILED"}:
+    if post["status"] not in {"PUBLISH_COMPLETE", "SEND_TO_USER_INBOX", "FAILED"}:
         try:
             post = await posting.refresh_post_status(post)
         except Exception as exc:  # noqa: BLE001 - keep polling on transient errors

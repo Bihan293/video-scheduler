@@ -157,14 +157,19 @@ async def get_creator_info(token: str) -> dict[str, Any]:
 
 
 def chunk_plan(video_size: int) -> tuple[int, int]:
-    """Return (chunk_size, total_chunk_count) accepted by TikTok."""
+    """Return (chunk_size, total_chunk_count) accepted by TikTok.
+
+    TikTok requires ``total_chunk_count = floor(video_size / chunk_size)``.
+    The trailing bytes are merged into the final chunk (up to 128 MB), so the
+    last chunk may be larger than ``chunk_size``.
+    """
     if video_size <= 0:
         raise TikTokError("Пустой видеофайл")
     if video_size <= MIN_CHUNK:
         return video_size, 1
     chunk_size = max(MIN_CHUNK, math.ceil(video_size / 10))
     chunk_size = min(chunk_size, MAX_CHUNK)
-    total = math.ceil(video_size / chunk_size)
+    total = max(1, video_size // chunk_size)
     if total > MAX_CHUNKS:  # pragma: no cover - only for enormous files
         raise TikTokError("Видео слишком большое для загрузки по частям")
     return chunk_size, total
@@ -189,6 +194,8 @@ async def init_direct_post(
             "disable_duet": disable_duet,
             "disable_stitch": disable_stitch,
             "video_cover_timestamp_ms": 1000,
+            "brand_content_toggle": False,
+            "brand_organic_toggle": False,
         },
         "source_info": {
             "source": "FILE_UPLOAD",
@@ -220,13 +227,21 @@ async def init_inbox_upload(
 async def upload_video(upload_url: str, video_path: Path) -> None:
     size = video_path.stat().st_size
     chunk_size, total_chunks = chunk_plan(size)
+    mime = {
+        ".mp4": "video/mp4",
+        ".m4v": "video/mp4",
+        ".mov": "video/quicktime",
+        ".webm": "video/webm",
+    }.get(video_path.suffix.lower(), "video/mp4")
     with video_path.open("rb") as fh:
         for index in range(total_chunks):
             start = index * chunk_size
-            chunk = fh.read(chunk_size)
+            # The final chunk absorbs the trailing bytes and may exceed
+            # chunk_size (TikTok allows up to 128 MB for the last chunk).
+            chunk = fh.read() if index == total_chunks - 1 else fh.read(chunk_size)
             end = start + len(chunk) - 1
             headers = {
-                "Content-Type": "video/mp4",
+                "Content-Type": mime,
                 "Content-Length": str(len(chunk)),
                 "Content-Range": f"bytes {start}-{end}/{size}",
             }

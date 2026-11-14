@@ -23,11 +23,45 @@ class ChunkPlanTests(unittest.TestCase):
         chunk, count = tiktok.chunk_plan(size)
         self.assertGreaterEqual(chunk, tiktok.MIN_CHUNK)
         self.assertLessEqual(chunk, tiktok.MAX_CHUNK)
-        self.assertEqual(count, (size + chunk - 1) // chunk)
+        self.assertEqual(count, size // chunk)
+
+    def test_trailing_bytes_are_merged_into_last_chunk(self):
+        size = 50_000_123
+        chunk, count = tiktok.chunk_plan(size)
+        self.assertEqual(count, size // chunk)
+        last_chunk = size - (count - 1) * chunk
+        self.assertGreaterEqual(last_chunk, chunk)
+        self.assertLessEqual(last_chunk, 128 * 1024 * 1024)
 
     def test_empty_file_rejected(self):
         with self.assertRaises(tiktok.TikTokError):
             tiktok.chunk_plan(0)
+
+
+class DirectPostPayloadTests(unittest.IsolatedAsyncioTestCase):
+    async def test_direct_post_includes_brand_flags(self):
+        captured = {}
+
+        async def fake_api(method, path, *, token, body=None, timeout=60):
+            captured.update(body or {})
+            return {}
+
+        original = tiktok._api
+        tiktok._api = fake_api
+        try:
+            await tiktok.init_direct_post(
+                "token",
+                title="hello",
+                privacy_level="SELF_ONLY",
+                video_size=1024,
+            )
+        finally:
+            tiktok._api = original
+
+        info = captured["post_info"]
+        self.assertIs(info["brand_content_toggle"], False)
+        self.assertIs(info["brand_organic_toggle"], False)
+        self.assertEqual(info["privacy_level"], "SELF_ONLY")
 
 
 class DemoStatusTests(unittest.TestCase):

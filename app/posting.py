@@ -148,7 +148,7 @@ async def publish(
 
 async def refresh_post_status(post: dict[str, Any]) -> dict[str, Any]:
     """Fetch the current status for a post and persist it."""
-    if post["status"] in {"PUBLISH_COMPLETE", "FAILED"}:
+    if post["status"] in {"PUBLISH_COMPLETE", "SEND_TO_USER_INBOX", "FAILED"}:
         return post
 
     if config.DEMO_MODE or str(post.get("publish_id", "")).startswith("demo_"):
