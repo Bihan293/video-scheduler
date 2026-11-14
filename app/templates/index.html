@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ app_name }} — публикация видео в TikTok{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-copy">
+    <span class="pill"><span class="dot"></span> TikTok Content Posting API</span>
+    <h1>Видео в TikTok<br><span class="grad">из браузера и Telegram</span></h1>
+    <p class="lead">
+      Подключите аккаунт через официальный TikTok Login Kit, загрузите ролик —
+      и он уйдёт в черновики или на публикацию. Без сторонних расширений и паролей.
+    </p>
+    <div class="cta-row">
+      {% if account %}
+        <a class="btn primary" href="/dashboard">Открыть кабинет</a>
+      {% else %}
+        <a class="btn primary" href="/auth/tiktok">Подключить TikTok</a>
+      {% endif %}
+      <a class="btn ghost" href="#how">Как это работает</a>
+    </div>
+    <ul class="checks">
+      <li>Официальный OAuth — пароль не покидает TikTok</li>
+      <li>Публикация сразу или в черновики</li>
+      <li>Telegram-бот для постинга с телефона</li>
+    </ul>
+  </div>
+
+  <div class="hero-visual" aria-hidden="true">
+    <div class="phone">
+      <div class="phone-top">
+        <span class="phone-title">Новый пост</span>
+        <span class="phone-dot"></span>
+      </div>
+      <div class="phone-video">
+        <div class="scan"></div>
+        <span class="play">▶</span>
+      </div>
+      <div class="phone-meta">
+        <div class="avatar-mini"></div>
+        <div>
+          <b>video.scheduler</b>
+          <span>Черновик готов · 0:12</span>
+        </div>
+      </div>
+      <div class="phone-actions">
+        <span class="chip">720p</span>
+        <span class="chip">MP4</span>
+        <span class="chip accent">Готово</span>
+      </div>
+    </div>
+    <div class="glow"></div>
+  </div>
+</section>
+
+<section class="logos">
+  <span>Работает с</span>
+  <b>TikTok Login Kit</b>
+  <b>Content Posting API</b>
+  <b>Telegram Bot API</b>
+</section>
+
+<section id="how" class="section">
+  <h2>Три шага до публикации</h2>
+  <div class="steps">
+    <article class="step">
+      <span class="step-num">01</span>
+      <h3>Подключите аккаунт</h3>
+      <p>Нажмите «Подключить TikTok» и подтвердите доступ на стороне TikTok. Мы получаем только токен и базовый профиль.</p>
+    </article>
+    <article class="step">
+      <span class="step-num">02</span>
+      <h3>Загрузите видео</h3>
+      <p>Перетащите MP4 или MOV, добавьте описание и выберите приватность. Файл уходит напрямую в TikTok.</p>
+    </article>
+    <article class="step">
+      <span class="step-num">03</span>
+      <h3>Следите за статусом</h3>
+      <p>Кабинет покажет обработку, отправку в черновики или публикацию. Бот пришлёт результат в Telegram.</p>
+    </article>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Почему это удобно</h2>
+  <div class="cards">
+    <article class="card">
+      <h3>Из Telegram</h3>
+      <p>Отправьте боту видео и подпись — он загрузит ролик в ваш аккаунт. Удобно, когда всё снимается на телефон.</p>
+    </article>
+    <article class="card">
+      <h3>Без пароля</h3>
+      <p>Авторизация проходит на tiktok.com. Приложение хранит только OAuth-токен и может быть отключено в один клик.</p>
+    </article>
+    <article class="card">
+      <h3>Черновики и публикация</h3>
+      <p>По умолчанию видео попадает в черновики TikTok. Прямая публикация включается после аудита приложения.</p>
+    </article>
+  </div>
+</section>
+
+<section class="section band">
+  <div>
+    <h2>Готовы попробовать?</h2>
+    <p class="muted">Подключение занимает меньше минуты. Видео можно заменить или удалить в любой момент.</p>
+  </div>
+  <a class="btn primary" href="{{ '/dashboard' if account else '/auth/tiktok' }}">
+    {{ 'Открыть кабинет' if account else 'Подключить TikTok' }}
+  </a>
+</section>
+
+{% endblock %}

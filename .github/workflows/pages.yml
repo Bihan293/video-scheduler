@@ -24,13 +24,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Build static site
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "::error::Set the repository variable APP_URL (public app URL) before deploying."
+            exit 1
+          fi
+          if [ -z "$CONTACT_EMAIL" ]; then
+            echo "::error::Set the repository variable CONTACT_EMAIL before deploying."
+            exit 1
+          fi
+          python3 scripts/build_site.py
+        env:
+          APP_NAME: ${{ vars.APP_NAME || 'Video Scheduler' }}
+          APP_URL: ${{ vars.APP_URL }}
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: site-dist
 
       - name: Deploy
         id: deployment

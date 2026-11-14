@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__APP_NAME__ — публикация видео в TikTok</title>
+  <meta name="description" content="__APP_NAME__ помогает авторам загружать видео в TikTok через официальный Content Posting API: из браузера и Telegram.">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a class="brand" href="./index.html"><span class="logo">V</span> __APP_NAME__</a>
+      <nav>
+        <a href="./privacy.html">Privacy</a>
+        <a href="./terms.html">Terms</a>
+        <a href="__APP_URL__">Открыть приложение</a>
+      </nav>
+    </header>
+
+    <main>
+      <span class="pill"><span class="dot"></span> TikTok Content Posting API</span>
+      <h1>Публикация видео в TikTok<br>из браузера и Telegram</h1>
+      <p class="lead">
+        __APP_NAME__ — небольшой инструмент для авторов и небольших команд.
+        Подключите аккаунт через официальный TikTok Login Kit, загрузите ролик
+        и отправьте его в черновики или на публикацию. Пароль TikTok остаётся
+        на стороне TikTok.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="__APP_URL__">Открыть приложение</a>
+        <a class="btn ghost" href="__APP_URL__/dashboard">Кабинет</a>
+      </div>
+
+      <div class="grid">
+        <div class="card"><b>OAuth 2.0</b><span>Доступ выдаётся на tiktok.com и может быть отозван в любой момент.</span></div>
+        <div class="card"><b>Черновики</b><span>Видео попадает в инбокс TikTok — вы публикуете его сами.</span></div>
+        <div class="card"><b>Telegram</b><span>Бот принимает видео с телефона и показывает статус загрузки.</span></div>
+      </div>
+
+      <h2>Что делает приложение</h2>
+      <ul>
+        <li>авторизует пользователя через TikTok Login Kit и хранит OAuth-токен;</li>
+        <li>принимает видеофайл, описание и настройки приватности;</li>
+        <li>загружает видео через Content Posting API в черновики или публикует его;</li>
+        <li>показывает статус обработки и историю загрузок;</li>
+        <li>позволяет отключить аккаунт и удалить сохранённые данные.</li>
+      </ul>
+
+      <div class="note">
+        Приложение не связано с TikTok и не одобрено TikTok. TikTok является
+        товарным знаком соответствующих владельцев. Публикация возможна только
+        в пределах правил TikTok и предоставленных API-разрешений.
+      </div>
+
+      <h2>Контакты</h2>
+      <p>
+        Поддержка и вопросы по данным: <a href="mailto:__CONTACT_EMAIL__">__CONTACT_EMAIL__</a>.<br>
+        Политика конфиденциальности: <a href="./privacy.html">privacy.html</a> ·
+        Условия использования: <a href="./terms.html">terms.html</a>.
+      </p>
+    </main>
+
+    <footer>
+      © __YEAR__ __APP_NAME__. Не аффилировано с TikTok.
+      <span class="small">Обновлено: __UPDATED__</span>
+    </footer>
+  </div>
+</body>
+</html>
